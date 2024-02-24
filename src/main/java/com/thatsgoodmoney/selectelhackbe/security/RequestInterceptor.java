@@ -24,7 +24,6 @@ public class RequestInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         try {
-            System.out.println("preHandle");
             if (shouldFilter(request)) {
                 final String token = getTokenFromRequest(request);
                 Long idFromStorage = authService.userIdFromStorage(token);
@@ -36,12 +35,12 @@ public class RequestInterceptor implements HandlerInterceptor {
                 }
                 request.setAttribute("userId", idFromToken);
             }
-            System.out.println("all correct");
             return true;
         } catch (JwtException e) {
             response.setStatus(403);
             return false;
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             response.setStatus(500);
             return false;
         }
