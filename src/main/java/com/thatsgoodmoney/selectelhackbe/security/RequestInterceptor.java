@@ -19,7 +19,7 @@ public class RequestInterceptor implements HandlerInterceptor {
     private static final String AUTHORIZATION = "authorization";
     private static final String EMPTY_TOKEN = "";
     private final Set<String> methodsToFilter = Set.of("GET", "POST", "PUT", "PATCH", "DELETE");
-    private final Set<String> filterIgnorePaths = Set.of("/login", "/registration", "/health-check");
+    private final Set<String> filterIgnorePaths = Set.of("/auth/login", "/auth/registration", "/health-check");
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
@@ -29,15 +29,14 @@ public class RequestInterceptor implements HandlerInterceptor {
                 Long idFromStorage = authService.userIdFromStorage(token);
                 Long idFromToken = authService.userIdFromToken(token);
                 if (token.equals(EMPTY_TOKEN) || idFromStorage == -1L || !idFromStorage.equals(idFromToken)) {
-                    System.out.println("smth wrong with token");
-                    response.setStatus(403);
+                    response.setStatus(401);
                     return false;
                 }
                 request.setAttribute("userId", idFromToken);
             }
             return true;
         } catch (JwtException e) {
-            response.setStatus(403);
+            response.setStatus(401);
             return false;
         } catch (Exception e) {
             System.out.println(e.getMessage());
